@@ -10,6 +10,7 @@ import os
 import logging
 from .typeusage import TypeUsage
 
+
 def result_iter(cursor, arraysize=1000):
     """An iterator that uses fetchmany to keep memory usage down
 
@@ -31,12 +32,32 @@ class Connector(object):
         current_folder = os.path.dirname(os.path.abspath(__file__))
         db_path = os.path.abspath(os.path.join(current_folder, os.pardir, 'data', db_name))
 
-        logging.info("Connecting to database at ", db_path)
+        logging.debug("Connecting to database at ", db_path)
         self.conn = jaydebeapi.connect("org.hsqldb.jdbcDriver",
                                        "jdbc:hsqldb:file:" + db_path,
                                        ["SA", ""],
                                        os.path.join(current_folder, "hsqldb.jar"), )
-        return
+
+    @staticmethod
+    def call_query():
+        # check detectors.alsmostequal equality testing if changing the order!
+        return 'SELECT methodId FROM callList WHERE typeusageId={0} ORDER BY methodId'
+
+    def gettypeusage(self, id):
+        curs = self.cursor()
+        curs.execute('SELECT id, class, lineNr, context FROM typeusage WHERE id={0}'.format(id))
+        tmp = curs.fetchone()
+        curs.execute(self.call_query().format(id))
+        ret = TypeUsage(tmp, curs.fetchall())
+        curs.close()
+        return ret
+
+    def typeusagecount(self):
+        curs = self.cursor()
+        curs.execute('SELECT COUNT(id) FROM typeusage')
+        ret = curs.fetchone()
+        curs.close()
+        return ret[0].longValue()
 
     def cursor(self):
         return self.conn.cursor()
@@ -45,17 +66,15 @@ class Connector(object):
         self.conn.close()
 
 
-class Type(object):
+class TypeLoader(Connector):
     """Provides generators for the types and their relevant data"""
 
     def __init__(self, dbName):
-        self.dbName = dbName
-        self.connector = Connector(self.dbName)
-        return
+        super().__init__(dbName)
 
     def separators(self):
         """Generator for all typenames in databse"""
-        curs = self.connector.cursor()
+        curs = self.cursor()
         curs.execute('SELECT id, typename FROM type')
         for result in result_iter(curs):
             yield result
@@ -66,15 +85,11 @@ class Type(object):
     def typeusage_query():
         return 'SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0[0]}'
 
-    @staticmethod
-    def call_query():
-        return 'SELECT methodId FROM callList WHERE typeusageId={0}'
-
     def data(self, qualifier):
         """Generator for list of typeusages grouped by type"""
-        curs = self.connector.cursor()
+        curs = self.cursor()
         curs.execute(self.typeusage_query().format(qualifier))
-        call_cursor = self.connector.cursor()
+        call_cursor = self.cursor()
 
         for result in result_iter(curs):
             # result[0] is the typeusageId
@@ -87,26 +102,22 @@ class Type(object):
 
     def methods(self, qualifier):
         """Get all methodIds + Names for this type"""
-        curs = self.connector.cursor()
+        curs = self.cursor()
         curs.execute('SELECT id, methodName FROM method WHERE typeId={0[0]}'.format(qualifier))
         ret = curs.fetchall()
         curs.close()
         return ret
 
-    def close(self):
-        self.connector.close()
 
-
-class ContextType(Type):
+class ContextTypeLoader(TypeLoader):
     """Provide generators for relevant combinations of type and context"""
 
     def __init__(self, dbName):
         super().__init__(dbName)
-        return
 
     def separators(self):
         # todo does this make sense like this or should I rather only change the data call to save db queries?
-        curs = self.connector.cursor()
+        curs = self.cursor()
         for typeId, typename in super().separators():
             curs.execute('SELECT DISTINCT context FROM typeusage WHERE typeid={}'.format(typeId))
             for result in result_iter(curs):
@@ -141,10 +152,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print("Loading Type Data from", args.database)
-    test_connector(Type(args.database))
+    test_connector(TypeLoader(args.database))
 
     print()
     print("----------------------------------------------")
     print()
     print("Loading Type+Context Data from", args.database)
-    test_connector(ContextType(args.database), 40)
+    test_connector(ContextTypeLoader(args.database), 40)
