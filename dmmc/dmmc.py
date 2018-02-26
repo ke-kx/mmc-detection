@@ -58,11 +58,6 @@ if __name__ == '__main__':
 
     results = runner.run()
 
-    #import pickle
-
-    #with open('results.pkl', 'wb') as output:
-    #   pickle.dump(results, output)
-
     print("")
     logging.warning("Sorting results!")
     results_sorted = sorted(results, key=lambda x: x[1].score(), reverse=True)
@@ -73,4 +68,5 @@ if __name__ == '__main__':
     db = Connector(args.database)
     for id, score in results_sorted[:10]:
         tu = db.gettypeusage(id)
-        logging.info("Score: %s %s", score, tu)
+        score.setmcstrings(db)
+        print("Score: %s %s", score, tu)

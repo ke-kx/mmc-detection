@@ -38,17 +38,31 @@ class Connector(object):
                                        ["SA", ""],
                                        os.path.join(current_folder, "hsqldb.jar"), )
 
-    @staticmethod
-    def call_query():
         # check detectors.alsmostequal equality testing if changing the order!
-        return 'SELECT methodId FROM callList WHERE typeusageId={0} ORDER BY methodId'
+        self.call_query = 'SELECT methodId FROM callList WHERE typeusageId={0} ORDER BY methodId'
+        self.callstrings_query = 'SELECT methodname FROM callList JOIN method ON methodId = id WHERE typeusageId = {0}'
 
     def gettypeusage(self, id):
         curs = self.cursor()
         curs.execute('SELECT id, class, lineNr, context FROM typeusage WHERE id={0}'.format(id))
         tmp = curs.fetchone()
-        curs.execute(self.call_query().format(id))
-        ret = TypeUsage(tmp, curs.fetchall())
+        curs.execute(self.call_query.format(id))
+        ret = TypeUsage(tmp, [c[0] for c in curs.fetchall()])
+        curs.close()
+        ret.callstrings = self._getcallstrings(id)
+        return ret
+
+    def _getcallstrings(self, id):
+        curs = self.cursor()
+        curs.execute(self.callstrings_query.format(id))
+        ret = curs.fetchall()
+        curs.close()
+        return ret
+
+    def getmethod(self, methodId):
+        curs = self.cursor()
+        curs.execute('SELECT methodname FROM method WHERE id = {0}'.format(methodId))
+        ret = curs.fetchone()
         curs.close()
         return ret
 
@@ -71,6 +85,7 @@ class TypeLoader(Connector):
 
     def __init__(self, dbName):
         super().__init__(dbName)
+        self.typeusage_query = 'SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0[0]}'
 
     def separators(self):
         """Generator for all typenames in databse"""
@@ -83,18 +98,18 @@ class TypeLoader(Connector):
 
     @staticmethod
     def typeusage_query():
-        return 'SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0[0]}'
+        return
 
     def data(self, qualifier):
         """Generator for list of typeusages grouped by type"""
         curs = self.cursor()
-        curs.execute(self.typeusage_query().format(qualifier))
+        curs.execute(self.typeusage_query.format(qualifier))
         call_cursor = self.cursor()
 
         for result in result_iter(curs):
             # result[0] is the typeusageId
-            call_cursor.execute(self.call_query().format(result[0]))
-            tu = TypeUsage(result, call_cursor.fetchall())
+            call_cursor.execute(self.call_query.format(result[0]))
+            tu = TypeUsage(result, [c[0] for c in call_cursor.fetchall()])
             yield(tu)
 
         curs.close()
@@ -114,6 +129,7 @@ class ContextTypeLoader(TypeLoader):
 
     def __init__(self, dbName):
         super().__init__(dbName)
+        self.typeusage_query = "SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0[0]} and context='{0[2]}'"
 
     def separators(self):
         # todo does this make sense like this or should I rather only change the data call to save db queries?
@@ -124,10 +140,6 @@ class ContextTypeLoader(TypeLoader):
                 yield typeId, typename, result[0]
 
         curs.close()
-
-    @staticmethod
-    def typeusage_query():
-        return "SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0[0]} and context='{0[2]}'"
 
 
 if __name__ == '__main__':

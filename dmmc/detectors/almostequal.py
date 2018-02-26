@@ -10,13 +10,21 @@ class Score(object):
         self.e = 0
         self.ae = 0
         self.missingcalls = defaultdict(int)
+        self.mcstrings = None
 
     def score(self):
         return 1.0 - (self.e / (self.e + self.ae))
 
+    def setmcstrings(self, db):
+        self.mcstrings = {}
+        for set in self.missingcalls.keys():
+            calls = [db.getmethod(methodId) for methodId in set]
+            self.mcstrings[calls.__repr__()] = self.missingcalls[set]
+
     def __str__(self):
+        missingcalls = self.mcstrings if self.mcstrings else self.missingcalls
         return "Score: {0} (E: {1}, AE: {2}, missing: {3}"\
-            .format(self.score, self.e, self.ae, self.missingcalls)
+            .format(self.score(), self.e, self.ae, missingcalls)
 
     def __repr__(self):
         return "Score: {0}".format(self.score())
