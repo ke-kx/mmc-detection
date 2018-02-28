@@ -3,6 +3,7 @@ from collections import defaultdict
 # todo if ae too slow:
 # idea: already build call vectors (1 if call present) when generating tus
 # then it's as simple as subtracting the vectors and checking the abs (right?)
+# well, actually counting the +1 and -1s and from there havving the difs i think
 
 
 class Score(object):
@@ -46,6 +47,7 @@ class AlmostEqualDetector(object):
                 if self._equal(tu_a, tu_b):
                     scores[tu_a.id].e += 1
                     scores[tu_b.id].e += 1
+                    if tu_a == tu_b: scores[tu_a.id].e -= 1  # compensate for when comparing with itself
                 elif self._almost_equal(tu_a, tu_b):
                     score = scores[tu_a.id]
                     score.ae += 1

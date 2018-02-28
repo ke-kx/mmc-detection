@@ -3,13 +3,16 @@
 Returns a list of tables for the relevant separation level.
 """
 
-# TODO build class for some type hierarchy shit
+from collections import namedtuple
 
 import jaydebeapi
 import os
 import logging
-from .typeusage import TypeUsage
+from .typeusage import Type, TypeUsage
 
+
+# TODO build tus in a way that they all have a link to their respective Type object -> will be easy to build the vectors for clustering
+# additionally consider the type hierarchy stuff related to this
 
 def result_iter(cursor, arraysize=1000):
     """An iterator that uses fetchmany to keep memory usage down
@@ -44,10 +47,10 @@ class Connector(object):
 
     def gettypeusage(self, id):
         curs = self.cursor()
-        curs.execute('SELECT id, class, lineNr, context FROM typeusage WHERE id={0}'.format(id))
+        curs.execute('SELECT id, class, lineNr, context, typeId FROM typeusage WHERE id={0}'.format(id))
         tmp = curs.fetchone()
         curs.execute(self.call_query.format(id))
-        ret = TypeUsage(tmp, [c[0] for c in curs.fetchall()])
+        ret = TypeUsage(tmp[:-1], [c[0] for c in curs.fetchall()], self._gettype(tmp[-1]))
         curs.close()
         ret.callstrings = self._getcallstrings(id)
         return ret
@@ -58,6 +61,15 @@ class Connector(object):
         ret = curs.fetchall()
         curs.close()
         return ret
+
+    def _gettype(self, typeId):
+        curs = self.cursor()
+        curs.execute('SELECT id, parentId, typename FROM type WHERE id={0}'.format(typeId))
+        type = curs.fetchone()
+        curs.execute('SELECT id, methodName FROM method WHERE typeid={0}'.format(typeId))
+        methods = curs.fetchall()
+        curs.close()
+        return Type(type, methods)
 
     def getmethod(self, methodId):
         curs = self.cursor()
@@ -85,23 +97,22 @@ class TypeLoader(Connector):
 
     def __init__(self, dbName):
         super().__init__(dbName)
-        self.typeusage_query = 'SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0[0]}'
+        self.typeusage_query = 'SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0.typeId}'
 
     def separators(self):
         """Generator for all typenames in databse"""
+        Separator = namedtuple('Separator', ['typeId', 'typename'])
         curs = self.cursor()
         curs.execute('SELECT id, typename FROM type')
         for result in result_iter(curs):
-            yield result
+            yield Separator(*result)
 
         curs.close()
 
-    @staticmethod
-    def typeusage_query():
-        return
-
     def data(self, qualifier):
         """Generator for list of typeusages grouped by type"""
+        type = self._gettype(qualifier.typeId)
+
         curs = self.cursor()
         curs.execute(self.typeusage_query.format(qualifier))
         call_cursor = self.cursor()
@@ -109,7 +120,7 @@ class TypeLoader(Connector):
         for result in result_iter(curs):
             # result[0] is the typeusageId
             call_cursor.execute(self.call_query.format(result[0]))
-            tu = TypeUsage(result, [c[0] for c in call_cursor.fetchall()])
+            tu = TypeUsage(result, [c[0] for c in call_cursor.fetchall()], type)
             yield(tu)
 
         curs.close()
@@ -118,7 +129,7 @@ class TypeLoader(Connector):
     def methods(self, qualifier):
         """Get all methodIds + Names for this type"""
         curs = self.cursor()
-        curs.execute('SELECT id, methodName FROM method WHERE typeId={0[0]}'.format(qualifier))
+        curs.execute('SELECT id, methodName FROM method WHERE typeId={0.typeId}'.format(qualifier))
         ret = curs.fetchall()
         curs.close()
         return ret
@@ -129,15 +140,16 @@ class ContextTypeLoader(TypeLoader):
 
     def __init__(self, dbName):
         super().__init__(dbName)
-        self.typeusage_query = "SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0[0]} and context='{0[2]}'"
+        self.typeusage_query = "SELECT id, class, lineNr, context FROM typeusage WHERE typeid={0.typeId} and context='{0.context}'"
 
     def separators(self):
+        Separator = namedtuple('Separator', ['typeId', 'typename', 'context'])
         # todo does this make sense like this or should I rather only change the data call to save db queries?
         curs = self.cursor()
         for typeId, typename in super().separators():
             curs.execute('SELECT DISTINCT context FROM typeusage WHERE typeid={}'.format(typeId))
             for result in result_iter(curs):
-                yield typeId, typename, result[0]
+                yield Separator(typeId, typename, result[0])
 
         curs.close()
 
