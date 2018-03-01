@@ -28,8 +28,8 @@ class Runner(object):
         results_acc = []
 
         # TODO remove
-        # if separator.context == '$SWITCH_TABLE$eu$cqse$check$framework$scanner$ETokenType()':
-        #    return []
+        if separator.typename == 'eu.cqse.check.framework.scanner.ETokenType':
+            return []
 
         # obtain all tus for this abstraction level
         typeusages = list(loader.data(separator))
