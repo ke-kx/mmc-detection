@@ -1,0 +1,73 @@
+location:CallMethodOnThis:6 context:<init>() type:CallMethodOnThis call:<init>() extend:CallMethodOnThis
+location:CallMethodOnThis:11 context:context() type:CallMethodOnThis call:test7() extend:CallMethodOnThis
+location:TypeUsageTestData:3 context:<init>() type:TypeUsageTestData call:<init>() extend:TypeUsageTestData
+location:Main:58 context:<init>() type:Main call:<init>() extend:Main
+location:Main:67 context:context(MethodParameter,int) type:MethodParameter call:test2() call:test1() extend:MethodParameter
+location:Main:71 context:context(MethodParameter,int) type:LocalVariable call:<init>() call:cee() call:test3() extend:LocalVariable
+location:Main:77 context:context(MethodParameter,int) type:Inheritance call:<init>() call:cee() call:test3() extend:Inheritance extend:A
+location:Main:83 context:context(MethodParameter,int) type:Field call:foo() extend:Field
+location:Main:85 context:context(MethodParameter,int) type:Field42 call:test42() call:foo42() extend:Field42
+location:Main:98 context:context2(MethodParameter,int) type:A call:test3() extend:A
+location:Main:113 context:toto() type:java.lang.Object call:<init>() call:hashCode() 
+location:Main:115 context:toto() type:java.lang.String call:substring() extend:java.lang.String
+location:Main:118 context:toto() type:java.lang.Object call:notify() call:getClass() 
+location:Main:120 context:toto() type:java.lang.String call:matches() extend:java.lang.String
+location:A:48 context:<init>() type:A call:<init>() extend:A
+location:Inheritance:53 context:<init>() type:Inheritance call:<init>() extend:Inheritance extend:A
+location:LocalVariable:24 context:<init>() type:LocalVariable call:<init>() extend:LocalVariable
+location:Field:32 context:<init>() type:Field call:<init>() extend:Field
+location:typeusage.tests.ExpectedResult:3 context:<init>() type:typeusage.tests.ExpectedResult call:<init>() extend:typeusage.tests.ExpectedResult
+location:typeusage.tests.TestTypeUsageCollector:12 context:<init>() type:typeusage.tests.TestTypeUsageCollector call:<init>() extend:typeusage.tests.TestTypeUsageCollector extend:typeusage.miner.TypeUsageCollector
+location:typeusage.tests.TestTypeUsageCollector:15 context:<init>() type:java.util.ArrayList call:<init>() extend:java.util.ArrayList extend:java.util.AbstractCollection extend:java.util.AbstractList
+location:typeusage.tests.TestTypeUsageCollector:19 context:receive(TypeUsage) type:java.util.List call:add() extend:java.util.List
+location:typeusage.tests.TestTypeUsage:5 context:<init>() type:typeusage.tests.TestTypeUsage call:<init>() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.TestTypeUsage:13 context:call(String) type:java.lang.StringBuilder call:<init>() call:append() extend:java.lang.AbstractStringBuilder extend:java.lang.StringBuilder
+location:typeusage.tests.TestTypeUsage:13 context:call(String) type:java.lang.StringBuilder call:toString() extend:java.lang.AbstractStringBuilder extend:java.lang.StringBuilder
+location:typeusage.tests.TestTypeUsage:13 context:call(String) type:java.util.Set call:add() extend:java.util.Set
+location:typeusage.tests.Tests:16 context:<init>() type:typeusage.tests.Tests call:<init>() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:22 context:setup() type:typeusage.tests.TestTypeUsageCollector call:<init>() extend:typeusage.tests.TestTypeUsageCollector extend:typeusage.miner.TypeUsageCollector
+location:typeusage.tests.Tests:23 context:setup() type:typeusage.tests.TestTypeUsageCollector call:setDirToProcess() extend:typeusage.tests.TestTypeUsageCollector extend:typeusage.miner.TypeUsageCollector
+location:typeusage.tests.Tests:24 context:setup() type:typeusage.tests.TestTypeUsageCollector call:run() extend:typeusage.tests.TestTypeUsageCollector extend:typeusage.miner.TypeUsageCollector
+location:typeusage.tests.Tests:29 context:tu() type:typeusage.tests.TestTypeUsage call:<init>() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:34 context:testCallingMethodOnThis() type:typeusage.tests.Tests call:tu() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:34 context:testCallingMethodOnThis() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:34 context:testCallingMethodOnThis() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:41 context:testCallingMethodOnNull() type:typeusage.tests.Tests call:tu() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:41 context:testCallingMethodOnNull() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:41 context:testCallingMethodOnNull() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:46 context:testCallingMethodOnMethodParameter() type:typeusage.tests.Tests call:tu() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:46 context:testCallingMethodOnMethodParameter() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:46 context:testCallingMethodOnMethodParameter() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:46 context:testCallingMethodOnMethodParameter() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:51 context:testCallingMethodOnLocalVariable() type:typeusage.tests.Tests call:tu() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:51 context:testCallingMethodOnLocalVariable() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:51 context:testCallingMethodOnLocalVariable() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:51 context:testCallingMethodOnLocalVariable() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:51 context:testCallingMethodOnLocalVariable() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:56 context:testTypeUsageWithInheritance() type:typeusage.tests.Tests call:tu() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:56 context:testTypeUsageWithInheritance() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:56 context:testTypeUsageWithInheritance() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:56 context:testTypeUsageWithInheritance() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:56 context:testTypeUsageWithInheritance() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:62 context:testTypeUsageField() type:typeusage.tests.Tests call:tu() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:62 context:testTypeUsageField() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:62 context:testTypeUsageField() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:62 context:testTypeUsageField() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:65 context:testTypeUsageField() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:65 context:testTypeUsageField() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:65 context:testTypeUsageField() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:71 context:testTypeUsageCast() type:typeusage.tests.Tests call:tu() extend:typeusage.tests.Tests
+location:typeusage.tests.Tests:71 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:71 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:71 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:72 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:72 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:74 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:74 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:74 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:75 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:type() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:75 context:testTypeUsageCast() type:typeusage.tests.TestTypeUsage call:call() extend:typeusage.miner.TypeUsage extend:typeusage.tests.TestTypeUsage
+location:typeusage.tests.Tests:81 context:after() type:java.io.PrintStream call:println() extend:java.io.OutputStream extend:java.io.PrintStream extend:java.io.FilterOutputStream
+location:typeusage.tests.Tests:82 context:after() type:java.io.PrintStream call:println() extend:java.io.OutputStream extend:java.io.PrintStream extend:java.io.FilterOutputStream
+location:MethodParameter:15 context:<init>() type:MethodParameter call:<init>() extend:MethodParameter
+location:Field42:40 context:<init>() type:Field42 call:<init>() extend:Field42
