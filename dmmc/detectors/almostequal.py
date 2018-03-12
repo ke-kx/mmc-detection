@@ -5,8 +5,10 @@ from collections import defaultdict
 # then it's as simple as subtracting the vectors and checking the abs (right?)
 # well, actually counting the +1 and -1s and from there havving the difs i think
 
+from .score import Score
 
-class Score(object):
+
+class AEScore(Score):
     def __init__(self):
         self.e = 0
         self.ae = 0
@@ -26,9 +28,6 @@ class Score(object):
         missingcalls = self.mcstrings if self.mcstrings else self.missingcalls
         return "Score: {0} (E: {1}, AE: {2}, missing: {3}"\
             .format(self.score(), self.e, self.ae, missingcalls)
-
-    def __repr__(self):
-        return "Score: {0}".format(self.score())
 
 
 class AlmostEqualDetector(object):

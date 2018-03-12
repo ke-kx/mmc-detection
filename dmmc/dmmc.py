@@ -5,6 +5,11 @@ from statistics import mean, median
 
 
 class Runner(object):
+    """Handles the execution of one run with given loader and detectors.
+    Saves statistical data and outputs results in a large accumulated list.
+    """
+    type_filter_list = ['eu.cqse.check.framework.scanner.ETokenType', 'java.lang.StringBuilder']
+
     def __init__(self, loader, detectors):
         self.loader = loader
         self.detectors = detectors
@@ -12,30 +17,31 @@ class Runner(object):
         self.statisticalData = defaultdict(list)
 
     def run(self):
+        """Main method to start the analysis."""
         results_accumulated = []
 
-        total = loader.typeusagecount()
+        total = self.loader.typeusagecount()
 
         # go through all separators
-        for separator in loader.separators():
+        for separator in self.loader.separators():
                 results_accumulated += self.loop(separator)
                 logging.info("%d/%d", len(results_accumulated), total)
 
         return results_accumulated
 
     def loop(self, separator):
+        """Retrieve the typeusages for the given separator and use all given detectors to analyze them."""
         logging.info("Analyzing %s", separator)
         results_acc = []
 
-        # TODO remove
-        if separator.typename == 'eu.cqse.check.framework.scanner.ETokenType':
+        if separator.typename in self.type_filter_list:
             return []
 
         # obtain all tus for this abstraction level
-        typeusages = list(loader.data(separator))
+        typeusages = list(self.loader.data(separator))
 
         # todo note relevant data (dataset size, ....)
-        self.extractStatisticalData(typeusages)
+        self.extract_statistical_data(typeusages)
 
         # throw all anomaly detectors on the given data
         for detector in self.detectors:
@@ -48,7 +54,7 @@ class Runner(object):
 
         return results_acc
 
-    def extractStatisticalData(self, typeusages):
+    def extract_statistical_data(self, typeusages):
         if len(typeusages) > 10:
             self.statisticalData['tuCount'].append(len(typeusages))
             callcount = list(map(lambda tu: len(tu.calls), typeusages))
@@ -58,6 +64,18 @@ class Runner(object):
             self.statisticalData['calllistMedian'].append(median(callcount))
 
 
+def pretty_print_results(dbname, results_sorted, count):
+    print("")
+    logging.warning("First %d ids", count)
+    db = Connector(dbname)
+    for id, score in results_sorted[:count]:
+        tu = db.gettypeusage(id)
+        score.setmcstrings(db)
+        print(score, tu)
+        # print(tu.type)
+        # print(tu.vector())
+
+
 if __name__ == '__main__':
 
     import argparse
@@ -65,38 +83,30 @@ if __name__ == '__main__':
     from .database import Connector, ContextTypeLoader, TypeLoader
     from .detectors.almostequal import AlmostEqualDetector
 
+    # obtain input arguments
     parser = argparse.ArgumentParser(description="Test database connectivity")
     parser.add_argument('database', help='Name of database to connect to')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
-
     logging.info("TestRun on database %s", args.database)
 
+    # perform basic setup
     loader = ContextTypeLoader(args.database)
-    loader = TypeLoader(args.database)
+    # loader = TypeLoader(args.database)
     detectors = [AlmostEqualDetector(1)]
     runner = Runner(loader, detectors)
 
+    # start run
     results = runner.run()
 
-    print("")
-    logging.warning("Sorting results!")
+    # "pretty print" the resuls
     results_sorted = sorted(results, key=lambda x: x[1].score(), reverse=True)
-    print(results_sorted[:50])
-
-    print("")
-    logging.warning("First 10 ids")
-    db = Connector(args.database)
-    for id, score in results_sorted[:10]:
-        tu = db.gettypeusage(id)
-        score.setmcstrings(db)
-        print(score, tu)
-        print(tu.type)
-        print(tu.vector())
+    pretty_print_results(args.database, results_sorted, 100)
 
     print("\n--------")
     print("Analyzing just one typeusage: ")
+    db = Connector(args.database)
     tu = db.gettypeusage(34747)
     print(runner.loop(tu.separator()))
     print(tu.type)

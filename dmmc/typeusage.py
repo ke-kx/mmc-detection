@@ -1,6 +1,7 @@
 # TODO can have some functionality for converting to vector later (depending on baseline - all methods of the relevant type)
 
 from collections import namedtuple
+import numpy as np
 
 
 class Type(object):
@@ -28,7 +29,7 @@ class TypeUsage(object):
         return Separator(self.type.id, self.type.name, self.context)
 
     def vector(self):
-        return [(1 if m[0] in self.calls else 0) for m in self.type.methods]
+        return np.array([(1 if m[0] in self.calls else 0) for m in self.type.methods])
 
     def __str__(self):
         calls = self.callstrings if self.callstrings else self.calls
