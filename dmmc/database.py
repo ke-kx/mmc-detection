@@ -11,8 +11,7 @@ import logging
 from .typeusage import Type, TypeUsage
 
 
-# TODO build tus in a way that they all have a link to their respective Type object -> will be easy to build the vectors for clustering
-# additionally consider the type hierarchy stuff related to this
+# TODO consider the type hierarchy stuff related to the type object
 
 def result_iter(cursor, arraysize=1000):
     """An iterator that uses fetchmany to keep memory usage down

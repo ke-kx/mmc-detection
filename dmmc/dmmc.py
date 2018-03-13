@@ -24,35 +24,44 @@ class Runner(object):
 
         # go through all separators
         for separator in self.loader.separators():
-                results_accumulated += self.loop(separator)
-                logging.info("%d/%d", len(results_accumulated), total)
+            logging.info("Analyzing %s", separator)
+            if separator.typename in self.type_filter_list: continue
+
+            # obtain all tus for this abstraction level
+            typeusages = list(self.loader.data(separator))
+            results_accumulated += self.analyze(typeusages)
+            logging.info("%d/%d", len(results_accumulated), total)
 
         return results_accumulated
 
-    def loop(self, separator):
-        """Retrieve the typeusages for the given separator and use all given detectors to analyze them."""
-        logging.info("Analyzing %s", separator)
+    def analyze(self, typeusages):
+        """Use all given detectors to analyze the typeusages."""
         results_acc = []
 
-        if separator.typename in self.type_filter_list:
-            return []
-
-        # obtain all tus for this abstraction level
-        typeusages = list(self.loader.data(separator))
-
-        # todo note relevant data (dataset size, ....)
+        # note relevant data (dataset size, ....)
+        # todo do not save in global object
         self.extract_statistical_data(typeusages)
 
         # throw all anomaly detectors on the given data
         for detector in self.detectors:
-            # todo time analysis and save in meta db
+            # todo time analysis and save together with statistical data? in meta db
             results = detector.analyze(typeusages)
 
             # todo write out results to db - here could be smart cause of memory constraints?, but elsewhere would be cleaner
+            # todo consider if Database is actually necessary / useful or if text output can be enough
+            # todo use separate results database
             # todo this is not going to work right now with multiple detectors...
             results_acc += results.items()
 
         return results_acc
+
+    def analyze_one(self, tu):
+        """"Analyze the given typeusage with all given detectors.
+        Ensures that the tu to be analyzed isn't contained twice in the dataset to be analyzed."""
+        typeusages = list(self.loader.data(tu.separator()))
+        if tu not in typeusages:
+            typeusages.append(tu)
+        return self.analyze(typeusages)
 
     def extract_statistical_data(self, typeusages):
         if len(typeusages) > 10:
@@ -106,10 +115,7 @@ if __name__ == '__main__':
 
     print("\n--------")
     print("Analyzing just one typeusage: ")
-    db = Connector(args.database)
-    tu = db.gettypeusage(34747)
-    print(runner.loop(tu.separator()))
-    print(tu.type)
+    print(runner.analyze_one(loader.gettypeusage(34747)))
 
     print("\n--------")
     print("Statistical Data:")

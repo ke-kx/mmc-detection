@@ -38,7 +38,7 @@ class AlmostEqualDetector(object):
         """Go through all given TUs and check how anomalous they are.
         Return a dict with id to Score object mapping
         """
-        scores = defaultdict(Score)
+        scores = defaultdict(AEScore)
         typeusages = list(typeusages)
 
         for idx, tu_a in enumerate(typeusages):

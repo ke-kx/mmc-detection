@@ -46,6 +46,9 @@ if __name__ == "__main__":
     from ..database import Connector, ContextTypeLoader, TypeLoader
     from ..dmmc import Runner
 
+    # todo make testing a bit easier by having some sort of "main" class for the common setup stuff
+    # todo test with only one or two (ideally interesting) separators to understand better what is going on, where there are mistakes
+
     parser = argparse.ArgumentParser(description="Test database connectivity")
     parser.add_argument('database', help='Name of database to connect to')
     args = parser.parse_args()
