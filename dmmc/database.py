@@ -3,7 +3,7 @@
 Returns a list of tables for the relevant separation level.
 """
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 import jaydebeapi
 import os
@@ -158,6 +158,23 @@ class ContextTypeLoader(TypeLoader):
 
 class ClassMergeLoader(TypeLoader):
     """Merge TUs found in one class to one"""
+    def data(self, qualifier):
+        typeusages = list(super().data(qualifier))
+        merged = dict()
+
+        for tu in typeusages:
+            if tu.clss in merged:
+                current = merged[tu.clss]
+                current.id += "," + str(tu.id)
+                current.lineNr += "," + str(tu.lineNr)
+                current.context += "," + tu.context
+                current.calls |= tu.calls
+            else:
+                tu.id = str(tu.id)
+                tu.lineNr = str(tu.lineNr)
+                merged[tu.clss] = tu
+
+        return merged.values()
 
 
 def parse_arguments():
@@ -193,3 +210,9 @@ if __name__ == '__main__':
     print()
     print("Loading Type+Context Data from", args.database)
     test_connector(ContextTypeLoader(args.database), 40)
+
+    print()
+    print("----------------------------------------------")
+    print()
+    print("Merged typeusages from ", args.database)
+    test_connector(ClassMergeLoader(args.database))

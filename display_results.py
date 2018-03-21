@@ -3,8 +3,8 @@ from dmmc.analysis import *
 
 
 def pretty_print(analysis):
-    print("--------------")
     print("Loader: {0}".format(analysis.degraded_loader))
+    print(analysis.data_statistics_str())
 
     input_size_table(analysis)
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         with open("output/" + filename, "rb") as input:
             analysis = pickle.load(input)
 
-        print("----------")
+        print("--------------------------------------------------")
         print("Results for ", filename)
 
         pretty_print(analysis)

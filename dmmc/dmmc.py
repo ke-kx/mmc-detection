@@ -3,6 +3,8 @@ import logging
 from collections import defaultdict
 from statistics import mean, median
 
+import pickle
+
 
 class Runner(object):
     """Handles the execution of one run with given loader and detectors.
@@ -119,3 +121,8 @@ if __name__ == '__main__':
     print("\n--------")
     print("Statistical Data:")
     print(runner.statisticalData)
+
+    print("Saving run!")
+    with open("{0}.pkl".format(args.database), "wb") as output:
+        runner.loader = str(runner.loader)
+        pickle.dump(runner, output)

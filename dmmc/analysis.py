@@ -175,7 +175,7 @@ class DetectorStatistics(Scores):
 
     def __str__(self):
         ret = super().__str__()
-        ret += "Strangeness data: {0}\n".format(self.strangeness_data())
+        ret += "\nStrangeness data: {0}\n".format(self.strangeness_data())
         ret += "\n--- Per Input Size data --- \n"
         for input_len, score in self.scores_per_input_size.items():
             ret += "Input length: {0} - {1}\n".format(input_len, score)
@@ -253,18 +253,21 @@ class DegradedAnalysis(object):
                     data_for_current_size.precision_score += precision
                     data_for_current_size.recall_score += recall
 
-    def __str__(self):
-        """Give a relatively useful overview of the dataset and the results"""
-        # print general statistics
+    def data_statistics_str(self):
         ds = self.data_statistics
-        ret = "---------- Dataset statistics ----------\n"
-        # ret += "tuCounts: {0}".format(ds['tuCount'])
+        ret = "--- Dataset statistics ---\n"
+        ret += "tuCounts: {0}".format(ds['tuCount'])
 
         ret += "Calllist Minimums: {0}\n".format(list(map(min, ds['callCounts'])))
         ret += "Calllist Maximums: {0}\n".format(list(map(max, ds['callCounts'])))
         ret += "Calllist Averages: {0}\n".format(list(map(mean, ds['callCounts'])))
         ret += "Calllist Medians: {0}\n".format(list(map(median, ds['callCounts'])))
+        return ret
 
+    def __str__(self):
+        """Give a relatively useful overview of the dataset and the results"""
+        # print general statistics
+        ret = self.data_statistics_str()
         ret += "\n---------- Detectors ----------\n"
         # go through statistics of each detector
         for detector, statistics in self.detector_statistics.items():
