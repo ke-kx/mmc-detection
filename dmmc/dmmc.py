@@ -12,6 +12,7 @@ class Runner(object):
 
     def __init__(self, loader, detectors):
         self.loader = loader
+        # TODO remove the possibility to use multiple detectors here? seems nonsensical
         self.detectors = detectors
 
         self.statisticalData = defaultdict(list)
@@ -25,7 +26,8 @@ class Runner(object):
         # go through all separators
         for separator in self.loader.separators():
             logging.info("Analyzing %s", separator)
-            if separator.typename in self.type_filter_list: continue
+            if separator.typename in self.type_filter_list:
+                continue
 
             # obtain all tus for this abstraction level
             typeusages = list(self.loader.data(separator))
@@ -87,15 +89,10 @@ def pretty_print_results(dbname, results_sorted, count):
 
 if __name__ == '__main__':
 
-    import argparse
-
-    from .database import Connector, ContextTypeLoader, TypeLoader
+    from .database import Connector, ContextTypeLoader, TypeLoader, parse_arguments
     from .detectors.almostequal import AlmostEqualDetector
 
-    # obtain input arguments
-    parser = argparse.ArgumentParser(description="Test database connectivity")
-    parser.add_argument('database', help='Name of database to connect to')
-    args = parser.parse_args()
+    args = parse_arguments()
 
     logging.basicConfig(level=logging.INFO)
     logging.info("TestRun on database %s", args.database)
@@ -115,7 +112,9 @@ if __name__ == '__main__':
 
     print("\n--------")
     print("Analyzing just one typeusage: ")
-    print(runner.analyze_one(loader.gettypeusage(34747)))
+    results = runner.analyze_one(loader.gettypeusage(34747))
+    print(results)
+    pretty_print_results(args.database, results, len(results))
 
     print("\n--------")
     print("Statistical Data:")

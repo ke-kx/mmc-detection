@@ -90,6 +90,9 @@ class Connector(object):
     def close(self):
         self.conn.close()
 
+    def __str__(self):
+        return self.__class__.__name__
+
 
 class TypeLoader(Connector):
     """Provides generators for the types and their relevant data"""
@@ -153,10 +156,20 @@ class ContextTypeLoader(TypeLoader):
         curs.close()
 
 
+class ClassMergeLoader(TypeLoader):
+    """Merge TUs found in one class to one"""
+
+
+def parse_arguments():
+    import argparse
+    parser = argparse.ArgumentParser(description="Test database connectivity")
+    parser.add_argument('database', help='Name of database to connect to')
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
     """Tests"""
 
-    import argparse
     from itertools import islice
 
     def test_connector(connector, num=10):
@@ -170,9 +183,7 @@ if __name__ == '__main__':
 
         connector.close()
 
-    parser = argparse.ArgumentParser(description="Test database connectivity")
-    parser.add_argument('database', help='Name of database to connect to')
-    args = parser.parse_args()
+    args = parse_arguments()
 
     print("Loading Type Data from", args.database)
     test_connector(TypeLoader(args.database))

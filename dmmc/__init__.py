@@ -1,1 +1,1 @@
-__all__ = ['database', 'dmmc', 'typeusage']
+__all__ = ['analysis', 'database', 'dmmc', 'typeusage']

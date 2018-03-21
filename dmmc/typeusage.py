@@ -17,6 +17,7 @@ class Type(object):
         return "Type {0}(#{1})".format(self.name, self.id)
 
 
+# TODO remove callstring (can infer from Type object?!)
 class TypeUsage(object):
     def __init__(self, dbrow, calls, type):
         self.id, self.clss, self.lineNr, self.context = dbrow

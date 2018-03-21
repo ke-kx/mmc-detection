@@ -1,5 +1,6 @@
 # ignore data folder...
 data/
+output/
 
 # vim
 .tags

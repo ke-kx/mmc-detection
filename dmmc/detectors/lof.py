@@ -37,21 +37,30 @@ class LocalOutlierFactorDetector(object):
         scores = {tu.id: LOFScore(res) for tu, res in zip(typeusages, self.lof.negative_outlier_factor_)}
         return scores
 
+    def is_anomalous(self):
+        raise NotImplementedError("AAAAHHHHH!!!!")
+
+    def __hash__(self):
+        return hash((self.__class__, self.n_neighbors))
+
+    def __eq__(self, other):
+        return (self.n_neighbors) == (other.n_neighbors)
+
+    def __str__(self):
+        return "LocalOutlierFactorDetector with {0} neighbors".format(self.n_neighbors)
+
 
 if __name__ == "__main__":
 
-    import argparse
     import logging
 
-    from ..database import Connector, ContextTypeLoader, TypeLoader
+    from ..database import Connector, ContextTypeLoader, TypeLoader, parse_arguments
     from ..dmmc import Runner
 
     # todo make testing a bit easier by having some sort of "main" class for the common setup stuff
     # todo test with only one or two (ideally interesting) separators to understand better what is going on, where there are mistakes
 
-    parser = argparse.ArgumentParser(description="Test database connectivity")
-    parser.add_argument('database', help='Name of database to connect to')
-    args = parser.parse_args()
+    args = parse_arguments()
 
     logging.basicConfig(level=logging.INFO)
 
