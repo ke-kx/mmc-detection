@@ -77,13 +77,12 @@ class Runner(object):
             self.statisticalData['calllistMedian'].append(median(callcount))
 
 
-def pretty_print_results(dbname, results_sorted, count):
+def pretty_print_results(loader, results_sorted, count):
     print("")
     logging.warning("First %d ids", count)
-    db = Connector(dbname)
     for id, score in results_sorted[:count]:
-        tu = db.gettypeusage(id)
-        score.setmcstrings(db)
+        tu = loader.gettypeusage(id)
+        score.setmcstrings(loader)
         print(score, tu)
         # print(tu.type)
         # print(tu.vector())
@@ -91,7 +90,7 @@ def pretty_print_results(dbname, results_sorted, count):
 
 if __name__ == '__main__':
 
-    from .database import Connector, ContextTypeLoader, TypeLoader, parse_arguments
+    from .database import Connector, ContextTypeLoader, ClassMergeLoader, TypeLoader, parse_arguments
     from .detectors.almostequal import AlmostEqualDetector
 
     args = parse_arguments()
@@ -100,7 +99,8 @@ if __name__ == '__main__':
     logging.info("TestRun on database %s", args.database)
 
     # perform basic setup
-    loader = ContextTypeLoader(args.database)
+    # loader = ContextTypeLoader(args.database)
+    loader = ClassMergeLoader(args.database)
     # loader = TypeLoader(args.database)
     detectors = [AlmostEqualDetector(1)]
     runner = Runner(loader, detectors)
@@ -110,19 +110,19 @@ if __name__ == '__main__':
 
     # "pretty print" the resuls
     results_sorted = sorted(results, key=lambda x: x[1].score(), reverse=True)
-    pretty_print_results(args.database, results_sorted, 100)
+    pretty_print_results(loader, results_sorted, 100)
 
-    print("\n--------")
-    print("Analyzing just one typeusage: ")
-    results = runner.analyze_one(loader.gettypeusage(34747))
-    print(results)
-    pretty_print_results(args.database, results, len(results))
+    # print("\n--------")
+    # print("Analyzing just one typeusage: ")
+    # results = runner.analyze_one(loader.gettypeusage(34747))
+    # print(results)
+    # pretty_print_results(args.database, results, len(results))
 
-    print("\n--------")
-    print("Statistical Data:")
-    print(runner.statisticalData)
+    # print("\n--------")
+    # print("Statistical Data:")
+    # print(runner.statisticalData)
 
     print("Saving run!")
-    with open("{0}.pkl".format(args.database), "wb") as output:
+    with open("{0}_{1}.pkl".format(args.database, loader), "wb") as output:
         runner.loader = str(runner.loader)
         pickle.dump(runner, output)

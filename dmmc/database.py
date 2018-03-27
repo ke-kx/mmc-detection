@@ -158,6 +158,20 @@ class ContextTypeLoader(TypeLoader):
 
 class ClassMergeLoader(TypeLoader):
     """Merge TUs found in one class to one"""
+    def gettypeusage(self, id):
+        ids = id.split(",")
+        tus = [super(ClassMergeLoader, self).gettypeusage(i) for i in ids]
+        ret = tus[0]
+        ret.id = str(ret.id)
+        ret.lineNr = str(ret.lineNr)
+        if len(tus) > 1:
+            for tu in tus[1:]:
+                ret.id += "," + str(tu.id)
+                ret.lineNr += "," + str(tu.lineNr)
+                ret.context += "," + tu.context
+                ret.calls |= tu.calls
+        return ret
+
     def data(self, qualifier):
         typeusages = list(super().data(qualifier))
         merged = dict()

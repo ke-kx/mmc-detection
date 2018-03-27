@@ -4,7 +4,9 @@ from dmmc.analysis import *
 
 def pretty_print(analysis):
     print("Loader: {0}".format(analysis.degraded_loader))
-    print(analysis.data_statistics_str())
+
+    # todo print if necessary
+    # print(analysis.data_statistics_str())
 
     input_size_table(analysis)
 

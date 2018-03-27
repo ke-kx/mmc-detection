@@ -45,7 +45,7 @@ class DegradedLoader(object):
 
 class MultiDegradeLoader(DegradedLoader):
     """Also degrade additional tus in the data, used for robustness testing"""
-    def __init__(self, loader, degrade_additionally=2, seed_value=0):
+    def __init__(self, loader, degrade_additionally=1, seed_value=0):
         super().__init__(loader)
         self.degrade_additionally = degrade_additionally
 
@@ -280,12 +280,12 @@ class DegradedAnalysis(object):
 if __name__ == "__main__":
     import pickle
 
-    from .database import parse_arguments, ContextTypeLoader
+    from .database import parse_arguments, ContextTypeLoader, ClassMergeLoader
     from .detectors.almostequal import AlmostEqualDetector
     args = parse_arguments()
     logging.basicConfig(level=logging.INFO)
 
-    loader = RemoveMethodsLoader(ContextTypeLoader(args.database))
+    loader = DegradedLoader(ContextTypeLoader(args.database))
     detectors = [AlmostEqualDetector(), AlmostEqualDetector(2)]
     analysis = DegradedAnalysis(loader, detectors)
 
