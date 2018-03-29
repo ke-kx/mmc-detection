@@ -126,3 +126,4 @@ if __name__ == '__main__':
     with open("{0}_{1}.pkl".format(args.database, loader), "wb") as output:
         runner.loader = str(runner.loader)
         pickle.dump(runner, output)
+        pickle.dump(results, output)
